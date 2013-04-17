@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 
 from bs4 import BeautifulSoup
+from os import popen
 import urllib
+import re
 
 body = ""
 count= 0
 linklist = {}
-
+rows, columns = popen('stty size', 'r').read().split()
+columns = int(columns)/2
 print "\nWillkommen...\n"
 
 InputUrl = raw_input('\nBitte eine URL eingeben: ')
@@ -24,8 +27,9 @@ else :
 
 	print bs.title.text
 	html = bs.body.text.strip()
+	html1 = re.sub("(.{1,%i})(\s+|\Z)" %columns, "\\1\n", html)
 
-	for line in html.split("\n") :
+	for line in html1.split("\n") :
 
 		if line.strip() :
 
@@ -38,7 +42,7 @@ else :
 
 		if link.get('href') != None :
 			count += 1
-			print link.get('href') , [count]
+			print [count], str(link.text.strip()), '=>', link.get('href')
 			linklist[link.get("href")] = count
 
 
