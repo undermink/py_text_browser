@@ -5,6 +5,7 @@ import urllib
 
 body = ""
 count= 0
+linklist = {}
 
 print "\nWillkommen...\n"
 
@@ -38,4 +39,6 @@ else :
 		if link.get('href') != None :
 			count += 1
 			print link.get('href') , [count]
+			linklist[link.get("href")] = count
+
 
