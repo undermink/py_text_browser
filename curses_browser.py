@@ -6,6 +6,7 @@ from os import popen
 import urllib
 import re
 import locale
+from commands import *
 
 locale.setlocale(locale.LC_ALL, '')
 code = locale.getpreferredencoding()
@@ -29,6 +30,7 @@ header.addstr(0,columns-23, 10 * "#" + " undermink's Textbrowser " + 10 * "#")
 header.bkgd(curses.color_pair(2))
 scr.addstr(4,3,"Bitte eine URL eingeben: ")
 curses.echo()
+scr.keypad(1)
 curses.nocbreak()
 scr.refresh()
 header.refresh()
@@ -69,35 +71,34 @@ else:
 	curses.cbreak()
 	curses.noecho()
 	pad.refresh(0,0,8,3,rows+rows/2,(columns+columns/4)-3)
-	lpad = curses.newpad(5000,300)
+	lpad = curses.newpad(5000,(columns+columns)/3)
 	lpad.bkgd(curses.color_pair(2))
 	for link in bs.find_all('a') :
 		if link.get('href') != None :
 			count += 1
-			linklist += str(count) + str(link.text.strip()) + '=>' + link.get('href') + "\n"
-	utflinks = linklist.encode('utf-8')
-
+			linklist += "[" + str(count) + "] " + link.text.strip() + " => " + link.get('href') + "\n"
+			#linklist = re.sub("\xbb","",linklist)
 	try: 
+		utflinks = linklist.encode('utf-8')
 		lpad.addstr(utflinks)
 	except curses.error: pass
-
 	lpad.refresh(0,0,8,columns+columns/4,rows+rows/2,columns+columns-4)
 
 	while True:
 		cmd = scr.getch()
-		if  cmd == ord('s') :
+		if  cmd == curses.KEY_DOWN :
 			if pad_pos <= 10000 :
 				pad_pos += 1
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, (columns+columns/4)-3)
-		elif  cmd == ord('w') :
+		elif  cmd == curses.KEY_UP :
 			if pad_pos >= 1 :
 				pad_pos -= 1
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, (columns+columns/4)-3)
-		elif cmd == ord('a') :
+		elif cmd == curses.KEY_LEFT :
 			if pad_posx >= 1 :
 				pad_posx -= 1
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, (columns+columns/4)-3)
-		elif cmd == ord('d') :
+		elif cmd == curses.KEY_RIGHT :
 			if pad_posx <= 2999 :
 				pad_posx += 1
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, (columns+columns/4)-3)
@@ -109,7 +110,10 @@ else:
 			if lpad_pos >= 1 :
 				lpad_pos -= 1
 			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+rows/2,columns+columns-4)
+		elif cmd == ord('h') :
+			show_help(rows,columns)
 		elif cmd == ord('x') :
 			break
 
+curses.nocbreak(); scr.keypad(0); curses.echo()
 curses.endwin()
