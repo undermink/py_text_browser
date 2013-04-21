@@ -20,17 +20,23 @@ tworows = rows * 2
 twocolumns = columns + columns
 scr = curses.initscr()
 
+curses.start_color()
+curses.init_pair(1, curses.COLOR_RED, curses.COLOR_WHITE)
+curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLUE)
 scr.border(0)
-scr.addstr(2,columns-23, 10 * "#" + " undermink's Textbrowser " + 10 * "#")
-scr.addstr(4,1,"Bitte eine URL eingeben: ")
+header = curses.newwin(1, (columns-1)*2, 1, 1)
+header.addstr(0,columns-23, 10 * "#" + " undermink's Textbrowser " + 10 * "#")
+header.bkgd(curses.color_pair(2))
+scr.addstr(4,3,"Bitte eine URL eingeben: ")
 curses.echo()
 curses.nocbreak()
 scr.refresh()
-
+header.refresh()
 InputUrl = scr.getstr()
 url = InputUrl.strip("http://")
 
-Response = urllib.urlopen("http://"+url)                                   
+try: Response = urllib.urlopen("http://"+url)
+except all : scr.addstr(rows,columns-4,"wrong url")
 bs = BeautifulSoup(Response.read(), "lxml")
 
 if Response.code != 200 :
@@ -41,8 +47,9 @@ if Response.code != 200 :
 else:
 	
 	pad = curses.newpad(tworows,twocolumns)
-	scr.addstr(6,1,bs.title.text)
-	text = bs.body.text.strip()
+	scr.addstr(6,3,bs.title.text, curses.color_pair(1))
+	try: text = bs.body.text.strip()
+	except all: pass
 	text1 = re.sub("(.{1,%i})(\s+|\Z)" %columns, "\\1\n", text)
 
 	for line in text1.split("\n") :
@@ -55,8 +62,7 @@ else:
 	utfbody = body.encode('utf-8')
 	try: pad.addstr(utfbody)
 	except curses.error: pass
-	pad.refresh(0,0,8,1,rows+rows/2,columns+columns/2)
+	pad.refresh(0,0,8,3,rows+rows/2,columns+columns/2)
 
 scr.getch()
 curses.endwin()
-print InputUrl
