@@ -34,6 +34,8 @@ scr.refresh()
 header.refresh()
 InputUrl = scr.getstr()
 url = InputUrl.strip("http://")
+pad_pos = 0
+pad_posx = 0
 
 try: Response = urllib.urlopen("http://"+url)
 except all : scr.addstr(rows,columns-4,"wrong url")
@@ -46,7 +48,8 @@ if Response.code != 200 :
 
 else:
 	
-	pad = curses.newpad(tworows,twocolumns)
+	pad = curses.newpad(10000,3000)
+	pad.bkgd(curses.color_pair(1))
 	scr.addstr(6,3,bs.title.text, curses.color_pair(1))
 	try: text = bs.body.text.strip()
 	except all: pass
@@ -62,7 +65,29 @@ else:
 	utfbody = body.encode('utf-8')
 	try: pad.addstr(utfbody)
 	except curses.error: pass
-	pad.refresh(0,0,8,3,rows+rows/2,columns+columns/2)
+	curses.cbreak()
+	curses.noecho()
+	pad.refresh(0,0,8,3,rows+rows/2,columns+columns/4)
+	while True:
+		cmd = scr.getch()
+		if  cmd == ord('s') :
+			if pad_pos <= 10000 :
+				pad_pos += 1
+			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, columns+columns/4)
+		elif  cmd == ord('w') :
+			if pad_pos >= 1 :
+				pad_pos -= 1
+			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, columns+columns/4)
+		elif cmd == ord('a') :
+			if pad_posx >= 1 :
+				pad_posx -= 1
+			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, columns+columns/4)
+		elif cmd == ord('d') :
+			if pad_posx <= 2999 :
+				pad_posx += 1
+			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, columns+columns/4)
 
-scr.getch()
+		elif cmd == ord('x') :
+			break
+
 curses.endwin()
