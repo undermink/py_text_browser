@@ -12,7 +12,7 @@ code = locale.getpreferredencoding()
 
 body = ""
 count = 0
-linklist = {}
+linklist = ''
 rows, columns = popen('stty size', 'r').read().split()
 columns = int(columns) / 2
 rows = int(rows) / 2
@@ -36,6 +36,7 @@ InputUrl = scr.getstr()
 url = InputUrl.strip("http://")
 pad_pos = 0
 pad_posx = 0
+lpad_pos = 0
 
 try: Response = urllib.urlopen("http://"+url)
 except all : scr.addstr(rows,columns-4,"wrong url")
@@ -67,26 +68,47 @@ else:
 	except curses.error: pass
 	curses.cbreak()
 	curses.noecho()
-	pad.refresh(0,0,8,3,rows+rows/2,columns+columns/4)
+	pad.refresh(0,0,8,3,rows+rows/2,(columns+columns/4)-3)
+	lpad = curses.newpad(5000,300)
+	lpad.bkgd(curses.color_pair(2))
+	for link in bs.find_all('a') :
+		if link.get('href') != None :
+			count += 1
+			linklist += str(count) + str(link.text.strip()) + '=>' + link.get('href') + "\n"
+	utflinks = linklist.encode('utf-8')
+
+	try: 
+		lpad.addstr(utflinks)
+	except curses.error: pass
+
+	lpad.refresh(0,0,8,columns+columns/4,rows+rows/2,columns+columns-4)
+
 	while True:
 		cmd = scr.getch()
 		if  cmd == ord('s') :
 			if pad_pos <= 10000 :
 				pad_pos += 1
-			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, columns+columns/4)
+			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, (columns+columns/4)-3)
 		elif  cmd == ord('w') :
 			if pad_pos >= 1 :
 				pad_pos -= 1
-			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, columns+columns/4)
+			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, (columns+columns/4)-3)
 		elif cmd == ord('a') :
 			if pad_posx >= 1 :
 				pad_posx -= 1
-			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, columns+columns/4)
+			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, (columns+columns/4)-3)
 		elif cmd == ord('d') :
 			if pad_posx <= 2999 :
 				pad_posx += 1
-			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, columns+columns/4)
-
+			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, (columns+columns/4)-3)
+		elif cmd == ord('k') :
+			if pad_posx <= 4999 :
+				lpad_pos += 1
+			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+rows/2,columns+columns-4)
+		elif cmd == ord('i') :
+			if lpad_pos >= 1 :
+				lpad_pos -= 1
+			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+rows/2,columns+columns-4)
 		elif cmd == ord('x') :
 			break
 
