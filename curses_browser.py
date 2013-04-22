@@ -35,6 +35,7 @@ curses.nocbreak()
 scr.refresh()
 header.refresh()
 InputUrl = scr.getstr()
+curses.curs_set(0)
 url = InputUrl.strip("http://")
 pad_pos = 0
 pad_posx = 0
@@ -53,7 +54,8 @@ else:
 	
 	pad = curses.newpad(10000,3000)
 	pad.bkgd(curses.color_pair(1))
-	scr.addstr(6,3,bs.title.text, curses.color_pair(1))
+	if bs.title :
+		scr.addstr(6,3,bs.title.text, curses.color_pair(1))
 	try: text = bs.body.text.strip()
 	except all: pass
 	text1 = re.sub("(.{1,%i})(\s+|\Z)" %columns, "\\1\n", text)
@@ -110,8 +112,19 @@ else:
 			if lpad_pos >= 1 :
 				lpad_pos -= 1
 			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+rows/2,columns+columns-4)
+		elif cmd == ord('s') :
+			pad.clear()
+			try:
+				pad.addstr(str(bs.head))
+				pad.addstr(str(bs.html))
+			except curses.error: pass
+			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, (columns+columns/4)-3)
 		elif cmd == ord('h') :
 			show_help(rows,columns)
+			#scr.redrawwin()
+			#scr.touchwin()
+			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+rows/2,columns+columns-4)
+			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, (columns+columns/4)-3)
 		elif cmd == ord('x') :
 			break
 

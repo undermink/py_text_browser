@@ -10,9 +10,9 @@ def show_help(rows,columns) :
 	height = rows
 	width = columns
 	helpwin = curses.newwin(height, width, begin_y, begin_x)
-	helpwin.bkgd(curses.color_pair(2))
+	helpwin.bkgd(curses.color_pair(0))
 	helpwin.box()
-	helpwin.addstr(1,columns/2-6,"---Hilfe---")
+	helpwin.addstr(1,columns/2-6,"---Hilfe---", curses.A_BOLD)
 	helpwin.addstr(3,2,"h = diesen Hilfetext anzeigen")
 	helpwin.addstr(4,2,"s = Seitenquelltext zeigen")
 	#helpwin.addstr(6,2,"a = Seiteninhalt nach links scrollen")
@@ -22,4 +22,6 @@ def show_help(rows,columns) :
 	helpwin.addstr(7,2,"x = Programm beenden")
 	helpwin.addstr(9,2,"Pfeiltasten = Seiteninhalt scrollen")
 	helpwin.refresh()
-
+	helpwin.getch()
+	helpwin.clear()
+	helpwin.refresh()
