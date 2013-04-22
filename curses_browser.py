@@ -115,7 +115,6 @@ else:
 		elif cmd == ord('s') :
 			pad.clear()
 			try:
-				pad.addstr(str(bs.head))
 				pad.addstr(str(bs.html))
 			except curses.error: pass
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, (columns+columns/4)-3)
