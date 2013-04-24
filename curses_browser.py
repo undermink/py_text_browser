@@ -19,41 +19,44 @@ columns = int(columns) / 2
 rows = int(rows) / 2
 tworows = rows * 2
 twocolumns = columns + columns
+source = False
 scr = curses.initscr()
 
 curses.start_color()
 curses.init_pair(1, curses.COLOR_RED, curses.COLOR_WHITE)
 curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLUE)
+curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_WHITE)
 scr.border(0)
-header = curses.newwin(1, (columns-1)*2, 1, 1)
+header = curses.newwin(1, (columns-2)*2, 1, 1)
 header.addstr(0,columns-23, 10 * "#" + " undermink's Textbrowser " + 10 * "#")
 header.bkgd(curses.color_pair(2))
-scr.addstr(4,3,"Bitte eine URL eingeben: ")
+getUrl = curses.newwin(4,(columns-2)*2,4,3)
+getUrl.addstr(0,0,"Bitte eine URL eingeben: ")
 curses.echo()
 scr.keypad(1)
 curses.nocbreak()
 scr.refresh()
 header.refresh()
-InputUrl = scr.getstr()
+getUrl.refresh()
+InputUrl = getUrl.getstr()
 curses.curs_set(0)
-url = InputUrl.strip("http://")
 pad_pos = 0
 pad_posx = 0
 lpad_pos = 0
 
+url = InputUrl.strip("http://")
 try: Response = urllib.urlopen("http://"+url)
 except all : scr.addstr(rows,columns-4,"wrong url")
 bs = BeautifulSoup(Response.read(), "lxml")
-
 if Response.code != 200 :
-	
+
 	fehler = "Fehler: %i" % Response.code
 	scr.addstr(rows,columns-5,fehler)
-
-else:
 	
+else:
+
 	pad = curses.newpad(10000,3000)
-	pad.bkgd(curses.color_pair(1))
+	pad.bkgd(curses.color_pair(3))
 	if bs.title :
 		scr.addstr(6,3,bs.title.text, curses.color_pair(1))
 	try: text = bs.body.text.strip()
@@ -86,6 +89,8 @@ else:
 	except curses.error: pass
 	lpad.refresh(0,0,8,columns+columns/4,rows+rows/2,columns+columns-4)
 
+
+	
 	while True:
 		cmd = scr.getch()
 		if  cmd == curses.KEY_DOWN :
@@ -113,11 +118,58 @@ else:
 				lpad_pos -= 1
 			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+rows/2,columns+columns-4)
 		elif cmd == ord('s') :
-			pad.clear()
-			try:
-				pad.addstr(str(bs.html))
-			except curses.error: pass
+			if source == False :
+				source = True
+				pad.clear()
+				try:
+					pad.addstr(str(bs.html))
+				except curses.error: pass
+			else :
+				source = False
+				pad.clear()
+				try:
+					pad.addstr(utfbody)
+				except curses.error: pass
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, (columns+columns/4)-3)
+		elif cmd == ord('u') :
+			getUrl.clear()
+			getUrl.addstr(0,0,"Bitte eine URL eingeben: ")
+			curses.echo()
+			InputUrl = getUrl.getstr()
+			curses.noecho()
+			curses.cbreak()
+			pad.clear()
+			lpad.clear()
+			url = InputUrl.strip("http://")
+			try: Response = urllib.urlopen("http://"+url)
+			except IOError: scr.addstr(rows,columns-4,"wrong url")
+			bs = BeautifulSoup(Response.read(), "lxml")
+			try: text = bs.body.text.strip()
+			except all: pass
+			text1 = re.sub("(.{1,%i})(\s+|\Z)" %columns, "\\1\n", text)
+			body = ""
+			count = 0
+			linklist = ""
+			for line in text1.split("\n") :
+		
+				if line.strip() :
+		
+					body += line + "\n"
+		
+			#scr.addstr(8,1,body)
+			utfbody = body.encode('utf-8')
+			try: pad.addstr(utfbody)
+			except curses.error: pass
+			pad.refresh(0,0,8,3,rows+rows/2,(columns+columns/4)-3)
+			for link in bs.find_all('a') :
+				if link.get('href') != None :
+					count += 1
+					linklist += "[" + str(count) + "] " + link.text.strip() + " => " + link.get('href') + "\n"
+			try: 
+				utflinks = linklist.encode('utf-8')
+				lpad.addstr(utflinks)
+			except curses.error: pass
+			lpad.refresh(0,0,8,columns+columns/4,rows+rows/2,columns+columns-4)
 		elif cmd == ord('h') :
 			show_help(rows,columns)
 			#scr.redrawwin()
