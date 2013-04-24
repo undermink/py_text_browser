@@ -121,8 +121,7 @@ else:
 			if source == False :
 				source = True
 				pad.clear()
-				try:
-					pad.addstr(str(bs.html))
+				try: pad.addstr(str(bs.html))
 				except curses.error: pass
 			else :
 				source = False
