@@ -27,7 +27,7 @@ curses.init_pair(1, curses.COLOR_RED, curses.COLOR_WHITE)
 curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLUE)
 curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_WHITE)
 scr.border(0)
-header = curses.newwin(1, (columns-2)*2, 1, 1)
+header = curses.newwin(1, (columns-2)*2, 1, 2)
 header.addstr(0,columns-23, 10 * "#" + " undermink's Textbrowser " + 10 * "#")
 header.bkgd(curses.color_pair(2))
 getUrl = curses.newwin(4,(columns-2)*2,4,3)
@@ -46,7 +46,7 @@ lpad_pos = 0
 
 url = InputUrl.strip("http://")
 try: Response = urllib.urlopen("http://"+url)
-except all : scr.addstr(rows,columns-4,"wrong url")
+except : scr.addstr(rows,columns-4,"wrong url")
 bs = BeautifulSoup(Response.read(), "lxml")
 if Response.code != 200 :
 
@@ -57,11 +57,13 @@ else:
 
 	pad = curses.newpad(10000,3000)
 	pad.bkgd(curses.color_pair(3))
+	urlheader = curses.newwin(1,columns,6,3)
 	if bs.title :
-		scr.addstr(6,3,bs.title.text, curses.color_pair(1))
+		urlheader.addstr(0,0,bs.title.text, curses.color_pair(1))
 	try: text = bs.body.text.strip()
-	except all: pass
+	except : pass
 	text1 = re.sub("(.{1,%i})(\s+|\Z)" %columns, "\\1\n", text)
+	urlheader.refresh()
 
 	for line in text1.split("\n") :
 
@@ -76,7 +78,7 @@ else:
 	curses.cbreak()
 	curses.noecho()
 	pad.refresh(0,0,8,3,rows+rows/2,(columns+columns/4)-3)
-	lpad = curses.newpad(5000,(columns+columns)/3)
+	lpad = curses.newpad(5000,300)
 	lpad.bkgd(curses.color_pair(2))
 	for link in bs.find_all('a') :
 		if link.get('href') != None :
@@ -121,7 +123,9 @@ else:
 			if source == False :
 				source = True
 				pad.clear()
-				try: pad.addstr(str(bs.html))
+				src = str(bs.html)
+				src = re.sub("(.{1,%i})(\s+|\Z)" %columns, "\\1\n", src)
+				try: pad.addstr(src)
 				except curses.error: pass
 			else :
 				source = False
@@ -138,11 +142,18 @@ else:
 			curses.noecho()
 			curses.cbreak()
 			pad.clear()
+			pad_pos = 0
+			pad_posx = 0
+			lpad_pos = 0
 			lpad.clear()
 			url = InputUrl.strip("http://")
 			try: Response = urllib.urlopen("http://"+url)
 			except IOError: scr.addstr(rows,columns-4,"wrong url")
 			bs = BeautifulSoup(Response.read(), "lxml")
+			urlheader.clear()
+			try: urlheader.addstr(0,0,bs.title.text, curses.color_pair(1))
+			except : pass
+			urlheader.refresh()
 			try: text = bs.body.text.strip()
 			except all: pass
 			text1 = re.sub("(.{1,%i})(\s+|\Z)" %columns, "\\1\n", text)
