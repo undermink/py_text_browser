@@ -5,11 +5,11 @@ from bs4 import BeautifulSoup
 from os import popen
 import urllib
 import re
-import locale
+#import locale
 from commands import *
 
-locale.setlocale(locale.LC_ALL, '')
-code = locale.getpreferredencoding()
+#locale.setlocale(locale.LC_ALL, '')
+#code = locale.getpreferredencoding()
 
 body = ""
 count = 0
@@ -60,9 +60,14 @@ else:
 	urlheader = curses.newwin(1,columns,6,3)
 	if bs.title :
 		urlheader.addstr(0,0,bs.title.text, curses.color_pair(1))
-	try: text = bs.body.text.strip()
+	try: text = bs.body
 	except : pass
-	text1 = re.sub("(.{1,%i})(\s+|\Z)" %columns, "\\1\n", text)
+	text1 = re.sub("<br\s*/?>", "\n",str(text))
+	text1 = re.sub("<p.*?>","\n",text1)
+	text1 = re.sub("<div.*?>","\n",text1)
+	text1 = re.sub("<tr.*?>","\n",text1)
+	text1 = re.sub("<.*?>","\n",text1)
+	text1 = re.sub("(.{1,%i})(\s+|\Z)" %columns, "\\1\n", text1)
 	urlheader.refresh()
 
 	for line in text1.split("\n") :
@@ -72,8 +77,8 @@ else:
 			body += line + "\n"
 
 	#scr.addstr(8,1,body)
-	utfbody = body.encode('utf-8')
-	try: pad.addstr(utfbody)
+	#utfbody = body.encode('utf-8')
+	try: pad.addstr(body)
 	except curses.error: pass
 	curses.cbreak()
 	curses.noecho()
