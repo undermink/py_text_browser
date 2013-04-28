@@ -5,11 +5,7 @@ from bs4 import BeautifulSoup
 from os import popen
 import urllib
 import re
-#import locale
 from commands import *
-
-#locale.setlocale(locale.LC_ALL, '')
-#code = locale.getpreferredencoding()
 
 body = ""
 count = 0
@@ -44,6 +40,7 @@ curses.curs_set(0)
 pad_pos = 0
 pad_posx = 0
 lpad_pos = 0
+links = []
 
 url = InputUrl.strip("http://")
 try: Response = urllib.urlopen("http://"+url)
@@ -79,25 +76,24 @@ else:
 
 			body += line + "\n"
 
-	#scr.addstr(8,1,body)
-	utfbody = body.encode('utf-8')
-	try: pad.addstr(body)
+	#utfbody = body.encode('utf-8', 'ignore')
+	try : pad.addstr(body)
 	except curses.error: pass
 	curses.cbreak()
 	curses.noecho()
-	pad.refresh(0,0,8,3,rows+rows/2,(columns+columns/4)-3)
+	pad.refresh(0,0,8,3,rows+(rows/4)*3,(columns+columns/4)-3)
 	lpad = curses.newpad(5000,300)
 	lpad.bkgd(curses.color_pair(2))
 	for link in bs.find_all('a') :
 		if link.get('href') != None :
 			count += 1
+			links.append(link.get("href"))
 			linklist += "[" + str(count) + "] " + link.text.strip() + " => " + link.get('href') + "\n"
-			#linklist = re.sub("\xbb","",linklist)
 	try: 
-		utflinks = linklist.encode('utf-8')
+		utflinks = linklist.encode('utf-8', 'ignore')
 		lpad.addstr(utflinks)
 	except curses.error: pass
-	lpad.refresh(0,0,8,columns+columns/4,rows+rows/2,columns+columns-4)
+	lpad.refresh(0,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
 
 
 	
@@ -106,27 +102,27 @@ else:
 		if  cmd == curses.KEY_DOWN :
 			if pad_pos <= 10000 :
 				pad_pos += 1
-			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, (columns+columns/4)-3)
+			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
 		elif  cmd == curses.KEY_UP :
 			if pad_pos >= 1 :
 				pad_pos -= 1
-			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, (columns+columns/4)-3)
+			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
 		elif cmd == curses.KEY_LEFT :
 			if pad_posx >= 1 :
 				pad_posx -= 1
-			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, (columns+columns/4)-3)
+			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
 		elif cmd == curses.KEY_RIGHT :
 			if pad_posx <= 2999 :
 				pad_posx += 1
-			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, (columns+columns/4)-3)
+			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
 		elif cmd == ord('k') :
 			if pad_posx <= 4999 :
 				lpad_pos += 1
-			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+rows/2,columns+columns-4)
+			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
 		elif cmd == ord('i') :
 			if lpad_pos >= 1 :
 				lpad_pos -= 1
-			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+rows/2,columns+columns-4)
+			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
 		elif cmd == ord('j') :
 			if script == False :
 				script = True
@@ -139,9 +135,9 @@ else:
 			else :
 				script = False
 				pad.clear()
-				try: pad.addstr(utfbody)
+				try: pad.addstr(body)
 				except curses.error: pass
-			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, (columns+columns/4)-3)
+			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
 		elif cmd == ord('s') :
 			if source == False :
 				source = True
@@ -153,9 +149,9 @@ else:
 			else :
 				source = False
 				pad.clear()
-				try: pad.addstr(utfbody)
+				try: pad.addstr(body)
 				except curses.error: pass
-			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, (columns+columns/4)-3)
+			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
 		elif cmd == ord('u') :
 			getUrl.clear()
 			getUrl.addstr(0,0,"Bitte eine URL eingeben: ")
@@ -176,9 +172,15 @@ else:
 			try: urlheader.addstr(0,0,bs.title.text, curses.color_pair(1))
 			except : pass
 			urlheader.refresh()
-			try: text = bs.body.text.strip()
+			try: text = bs.body
 			except : pass
-			text1 = re.sub("(.{1,%i})(\s+|\Z)" %columns, "\\1\n", text)
+			text1 = re.sub("<br\s*/?>", "\n",str(text))
+			text1 = re.sub("<(script.*?|script)>([^<]+)<\/script>","[java-script]",text1)
+			text1 = re.sub("<p.*?>","\n",text1)
+			text1 = re.sub("<div.*?>","\n",text1)
+			text1 = re.sub("<tr.*?>","\n",text1)
+			text1 = re.sub("<.*?>","",text1)
+			text1 = re.sub("(.{1,%i})(\s+|\Z)" %columns, "\\1\n", text1)
 			body = ""
 			count = 0
 			linklist = ""
@@ -189,10 +191,10 @@ else:
 					body += line + "\n"
 		
 			#scr.addstr(8,1,body)
-			utfbody = body.encode('utf-8')
-			try: pad.addstr(utfbody)
+			#utfbody = body.encode('utf-8', 'ignore')
+			try: pad.addstr(body)
 			except curses.error: pass
-			pad.refresh(0,0,8,3,rows+rows/2,(columns+columns/4)-3)
+			pad.refresh(0,0,8,3,rows+(rows/4)*3,(columns+columns/4)-3)
 			for link in bs.find_all('a') :
 				if link.get('href') != None :
 					count += 1
@@ -201,13 +203,13 @@ else:
 				utflinks = linklist.encode('utf-8')
 				lpad.addstr(utflinks)
 			except curses.error: pass
-			lpad.refresh(0,0,8,columns+columns/4,rows+rows/2,columns+columns-4)
+			lpad.refresh(0,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
 		elif cmd == ord('h') :
 			show_help(rows,columns)
 			#scr.redrawwin()
 			#scr.touchwin()
-			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+rows/2,columns+columns-4)
-			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, (columns+columns/4)-3)
+			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
+			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
 		elif cmd == ord('x') :
 			break
 
