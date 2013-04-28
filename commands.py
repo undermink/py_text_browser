@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import curses
+import re
 
 def show_help(rows,columns) :
 	
@@ -27,3 +28,15 @@ def show_help(rows,columns) :
 	helpwin.getch()
 	helpwin.clear()
 	helpwin.refresh()
+
+def regex(text,columns) :
+	text1 = re.sub("<br\s*/?>", "\n",str(text))
+	text1 = re.sub("<(script.*?|script)>([^<]+)<\/script>","[java-script]",text1)
+	text1 = re.sub("<p.*?>","\n",text1)
+	text1 = re.sub("<div.*?>","\n",text1)
+	text1 = re.sub("<tr.*?>","\n",text1)
+	text1 = re.sub("<.*?>","",text1)
+	text1 = re.sub("(.{1,%i})(\s+|\Z)" %columns, "\\1\n", text1)
+	return text1
+
+

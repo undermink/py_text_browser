@@ -61,13 +61,8 @@ else:
 		except : pass
 	try: text = bs.body
 	except : pass
-	text1 = re.sub("<br\s*/?>", "\n",str(text))
-	text1 = re.sub("<(script.*?|script)>([^<]+)<\/script>","[java-script]",text1)
-	text1 = re.sub("<p.*?>","\n",text1)
-	text1 = re.sub("<div.*?>","\n",text1)
-	text1 = re.sub("<tr.*?>","\n",text1)
-	text1 = re.sub("<.*?>","",text1)
-	text1 = re.sub("(.{1,%i})(\s+|\Z)" %columns, "\\1\n", text1)
+	
+	text1 = regex(text,columns)
 	urlheader.refresh()
 
 	for line in text1.split("\n") :
@@ -173,13 +168,7 @@ else:
 			urlheader.refresh()
 			try: text = bs.body
 			except : pass
-			text1 = re.sub("<br\s*/?>", "\n",str(text))
-			text1 = re.sub("<(script.*?|script)>([^<]+)<\/script>","[java-script]",text1)
-			text1 = re.sub("<p.*?>","\n",text1)
-			text1 = re.sub("<div.*?>","\n",text1)
-			text1 = re.sub("<tr.*?>","\n",text1)
-			text1 = re.sub("<.*?>","",text1)
-			text1 = re.sub("(.{1,%i})(\s+|\Z)" %columns, "\\1\n", text1)
+			regex(text,columns)
 			body = ""
 			count = 0
 			linklist = ""
