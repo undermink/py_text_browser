@@ -76,7 +76,6 @@ else:
 
 			body += line + "\n"
 
-	#utfbody = body.encode('utf-8', 'ignore')
 	try : pad.addstr(body)
 	except curses.error: pass
 	curses.cbreak()
@@ -190,8 +189,6 @@ else:
 		
 					body += line + "\n"
 		
-			#scr.addstr(8,1,body)
-			#utfbody = body.encode('utf-8', 'ignore')
 			try: pad.addstr(body)
 			except curses.error: pass
 			pad.refresh(0,0,8,3,rows+(rows/4)*3,(columns+columns/4)-3)
@@ -206,8 +203,6 @@ else:
 			lpad.refresh(0,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
 		elif cmd == ord('h') :
 			show_help(rows,columns)
-			#scr.redrawwin()
-			#scr.touchwin()
 			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
 		elif cmd == ord('x') :
