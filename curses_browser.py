@@ -20,6 +20,7 @@ rows = int(rows) / 2
 tworows = rows * 2
 twocolumns = columns + columns
 source = False
+script = False
 scr = curses.initscr()
 
 curses.start_color()
@@ -59,14 +60,16 @@ else:
 	pad.bkgd(curses.color_pair(3))
 	urlheader = curses.newwin(1,columns,6,3)
 	if bs.title :
-		urlheader.addstr(0,0,bs.title.text, curses.color_pair(1))
+		try : urlheader.addstr(0,0,bs.title.text, curses.color_pair(1))
+		except : pass
 	try: text = bs.body
 	except : pass
 	text1 = re.sub("<br\s*/?>", "\n",str(text))
+	text1 = re.sub("<(script.*?|script)>([^<]+)<\/script>","[java-script]",text1)
 	text1 = re.sub("<p.*?>","\n",text1)
 	text1 = re.sub("<div.*?>","\n",text1)
 	text1 = re.sub("<tr.*?>","\n",text1)
-	text1 = re.sub("<.*?>","\n",text1)
+	text1 = re.sub("<.*?>","",text1)
 	text1 = re.sub("(.{1,%i})(\s+|\Z)" %columns, "\\1\n", text1)
 	urlheader.refresh()
 
@@ -77,7 +80,7 @@ else:
 			body += line + "\n"
 
 	#scr.addstr(8,1,body)
-	#utfbody = body.encode('utf-8')
+	utfbody = body.encode('utf-8')
 	try: pad.addstr(body)
 	except curses.error: pass
 	curses.cbreak()
@@ -124,6 +127,21 @@ else:
 			if lpad_pos >= 1 :
 				lpad_pos -= 1
 			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+rows/2,columns+columns-4)
+		elif cmd == ord('j') :
+			if script == False :
+				script = True
+				js = ''
+				for java in bs.find_all('script') :
+					js += str(java) + "\n"
+				pad.clear()
+				js = re.sub("(.{1,%i})(\s+|\Z)" %columns, "\\1\n", js)
+				pad.addstr(js)
+			else :
+				script = False
+				pad.clear()
+				try: pad.addstr(utfbody)
+				except curses.error: pass
+			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, (columns+columns/4)-3)
 		elif cmd == ord('s') :
 			if source == False :
 				source = True
@@ -135,8 +153,7 @@ else:
 			else :
 				source = False
 				pad.clear()
-				try:
-					pad.addstr(utfbody)
+				try: pad.addstr(utfbody)
 				except curses.error: pass
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+rows/2, (columns+columns/4)-3)
 		elif cmd == ord('u') :
@@ -160,7 +177,7 @@ else:
 			except : pass
 			urlheader.refresh()
 			try: text = bs.body.text.strip()
-			except all: pass
+			except : pass
 			text1 = re.sub("(.{1,%i})(\s+|\Z)" %columns, "\\1\n", text)
 			body = ""
 			count = 0
