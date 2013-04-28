@@ -28,33 +28,44 @@ header = curses.newwin(1, (columns-2)*2, 1, 2)
 header.addstr(0,columns-23, 10 * "#" + " undermink's Textbrowser " + 10 * "#")
 header.bkgd(curses.color_pair(2))
 getUrl = curses.newwin(4,(columns-2)*2,4,3)
-getUrl.addstr(0,0,"Bitte eine URL eingeben: ")
-curses.echo()
+
+#getUrl.addstr(0,0,"Bitte eine URL eingeben: ")
+#curses.echo()
 scr.keypad(1)
-curses.nocbreak()
+#curses.nocbreak()
 scr.refresh()
 header.refresh()
-getUrl.refresh()
-InputUrl = getUrl.getstr()
-curses.curs_set(0)
+#getUrl.refresh()
+#InputUrl = getUrl.getstr()
+#curses.curs_set(0)
 pad_pos = 0
 pad_posx = 0
 lpad_pos = 0
 links = []
 
-url = InputUrl.strip("http://")
-try: Response = urllib.urlopen("http://"+url)
-except : scr.addstr(rows,columns-4,"wrong url")
+#url = InputUrl.strip("http://")
+url = getinput(getUrl)
+
+try : Response = urllib.urlopen("http://"+url)
+except : 
+
+	scr.addstr(rows,columns-7,"!!!!ERROR!!!!\n", curses.A_BOLD)
+	scr.refresh()
+	scr.getch()
+	exit(scr)
+
 bs = BeautifulSoup(Response.read(), "lxml")
+
 if Response.code != 200 :
 
 	fehler = "Fehler: %i" % Response.code
 	scr.addstr(rows,columns-5,fehler)
 	
-else:
+else : 
 
 	pad = curses.newpad(10000,3000)
 	pad.bkgd(curses.color_pair(3))
+	pad.border(0)
 	urlheader = curses.newwin(1,columns,6,3)
 	if bs.title :
 		try : urlheader.addstr(0,0,bs.title.text, curses.color_pair(1))
@@ -168,7 +179,7 @@ else:
 			urlheader.refresh()
 			try: text = bs.body
 			except : pass
-			regex(text,columns)
+			text1 = regex(text,columns)
 			body = ""
 			count = 0
 			linklist = ""
@@ -197,5 +208,4 @@ else:
 		elif cmd == ord('x') :
 			break
 
-curses.nocbreak(); scr.keypad(0); curses.echo()
-curses.endwin()
+exit(scr)

@@ -29,7 +29,23 @@ def show_help(rows,columns) :
 	helpwin.clear()
 	helpwin.refresh()
 
+def getinput(getUrl) :
+	
+	getUrl.clear()
+	curses.curs_set(1)
+	getUrl.addstr(0,0,"Bitte eine URL eingeben: ")
+	curses.echo()
+	curses.nocbreak()
+	getUrl.refresh()
+	InputUrl = getUrl.getstr()
+	curses.curs_set(0)
+	curses.noecho()
+	curses.cbreak()
+	url = InputUrl.strip("http://")
+	return url
+
 def regex(text,columns) :
+
 	text1 = re.sub("<br\s*/?>", "\n",str(text))
 	text1 = re.sub("<(script.*?|script)>([^<]+)<\/script>","[java-script]",text1)
 	text1 = re.sub("<p.*?>","\n",text1)
@@ -39,4 +55,9 @@ def regex(text,columns) :
 	text1 = re.sub("(.{1,%i})(\s+|\Z)" %columns, "\\1\n", text1)
 	return text1
 
+def exit(scr) :
 
+	curses.nocbreak()
+	scr.keypad(0)
+	curses.echo()
+	curses.endwin()
