@@ -65,7 +65,6 @@ else :
 
 	pad = curses.newpad(10000,3000)
 	pad.bkgd(curses.color_pair(3))
-	pad.border(0)
 	urlheader = curses.newwin(1,columns,6,3)
 	if bs.title :
 		try : urlheader.addstr(0,0,bs.title.text, curses.color_pair(1))
@@ -86,6 +85,9 @@ else :
 	except curses.error: pass
 	curses.cbreak()
 	curses.noecho()
+	frame1 = curses.newwin(rows+(rows/4)*2-1,columns+(columns/4)-3,7,2)
+	frame1.border(0)
+	frame1.refresh()
 	pad.refresh(0,0,8,3,rows+(rows/4)*3,(columns+columns/4)-3)
 	lpad = curses.newpad(5000,300)
 	lpad.bkgd(curses.color_pair(2))
@@ -204,6 +206,9 @@ else :
 		elif cmd == ord('h') :
 			show_help(rows,columns)
 			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
+			frame1.clear()
+			frame1.border(0)
+			frame1.refresh()
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
 		elif cmd == ord('x') :
 			break
