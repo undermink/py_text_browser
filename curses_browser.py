@@ -27,7 +27,7 @@ scr.border(0)
 header = curses.newwin(1, (columns-2)*2, 1, 2)
 header.addstr(0,columns-23, 10 * "#" + " undermink's Textbrowser " + 10 * "#")
 header.bkgd(curses.color_pair(2))
-getUrl = curses.newwin(4,(columns-2)*2,4,3)
+getUrl = curses.newwin(1,(columns-2)*2,4,3)
 
 #getUrl.addstr(0,0,"Bitte eine URL eingeben: ")
 #curses.echo()
@@ -85,9 +85,7 @@ else :
 	except curses.error: pass
 	curses.cbreak()
 	curses.noecho()
-	frame1 = curses.newwin(rows+(rows/4)*2-1,columns+(columns/4)-3,7,2)
-	frame1.border(0)
-	frame1.refresh()
+	frames(rows,columns)
 	pad.refresh(0,0,8,3,rows+(rows/4)*3,(columns+columns/4)-3)
 	lpad = curses.newpad(5000,300)
 	lpad.bkgd(curses.color_pair(2))
@@ -205,10 +203,8 @@ else :
 			lpad.refresh(0,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
 		elif cmd == ord('h') :
 			show_help(rows,columns)
+			frames(rows,columns)
 			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
-			frame1.clear()
-			frame1.border(0)
-			frame1.refresh()
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
 		elif cmd == ord('x') :
 			break
