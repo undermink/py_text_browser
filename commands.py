@@ -11,7 +11,6 @@ def frames(rows,columns) :
 	frame2 = curses.newwin(rows+(rows/4)*2-1,columns-(columns/4)-1,7,columns+(columns/4)-1)
 	frame2.border(0)
 	frame2.refresh()
-#	lpad.refresh(0,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
 	frame1.erase()
 	frame2.erase()
 

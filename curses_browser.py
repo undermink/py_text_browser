@@ -52,7 +52,7 @@ except :
 	scr.addstr(rows,columns-7,"!!!!ERROR!!!!\n", curses.A_BOLD)
 	scr.refresh()
 	scr.getch()
-	exit(scr)
+	#exit(scr)
 
 bs = BeautifulSoup(Response.read(), "lxml")
 
