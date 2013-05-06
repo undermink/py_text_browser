@@ -29,21 +29,14 @@ header.addstr(0,columns-23, 10 * "#" + " undermink's Textbrowser " + 10 * "#")
 header.bkgd(curses.color_pair(2))
 getUrl = curses.newwin(1,(columns-2)*2,4,3)
 
-#getUrl.addstr(0,0,"Bitte eine URL eingeben: ")
-#curses.echo()
 scr.keypad(1)
-#curses.nocbreak()
 scr.refresh()
 header.refresh()
-#getUrl.refresh()
-#InputUrl = getUrl.getstr()
-#curses.curs_set(0)
 pad_pos = 0
 pad_posx = 0
 lpad_pos = 0
 links = []
-
-#url = InputUrl.strip("http://")
+lnumber = linkwin(rows,columns)
 url = getinput(getUrl)
 
 try : Response = urllib.urlopen("http://"+url)
@@ -52,7 +45,7 @@ except :
 	scr.addstr(rows,columns-7,"!!!!ERROR!!!!\n", curses.A_BOLD)
 	scr.refresh()
 	scr.getch()
-	#exit(scr)
+	exit(scr)
 
 bs = BeautifulSoup(Response.read(), "lxml")
 
@@ -108,6 +101,7 @@ else :
 			if pad_pos <= 10000 :
 				pad_pos += 1
 			frames(rows,columns)
+			pad.clrtoeol()
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
 			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
 		elif  cmd == curses.KEY_UP :
@@ -137,6 +131,11 @@ else :
 		elif cmd == ord('i') :
 			if lpad_pos >= 1 :
 				lpad_pos -= 1
+			frames(rows,columns)
+			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
+			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
+		elif cmd == ord('#') :
+		    	number = linkwin(rows,columns)
 			frames(rows,columns)
 			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
