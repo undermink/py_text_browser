@@ -36,7 +36,6 @@ pad_pos = 0
 pad_posx = 0
 lpad_pos = 0
 links = []
-lnumber = linkwin(rows,columns)
 url = getinput(getUrl)
 
 try : Response = urllib.urlopen("http://"+url)
@@ -219,7 +218,7 @@ else :
 			frames(rows,columns)
 			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
-		elif cmd == ord('x') :
+		elif cmd == ord('q') :
 			break
 
 exit(scr)

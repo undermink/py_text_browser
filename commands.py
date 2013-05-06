@@ -51,7 +51,7 @@ def show_help(rows,columns) :
 	#helpwin.addstr(7,2,"d = Seiteninhalt nach rechts scrollen")
 	helpwin.addstr(7,2,"i = Linkliste nach oben scrollen")
 	helpwin.addstr(8,2,"k = Linkliste nach unten scrollen")
-	helpwin.addstr(9,2,"x = Programm beenden")
+	helpwin.addstr(9,2,"q = Programm beenden")
 	helpwin.addstr(11,2,"Pfeiltasten = Seiteninhalt scrollen")
 	helpwin.refresh()
 	helpwin.getch()
