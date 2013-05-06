@@ -107,27 +107,39 @@ else :
 		if  cmd == curses.KEY_DOWN :
 			if pad_pos <= 10000 :
 				pad_pos += 1
+			frames(rows,columns)
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
+			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
 		elif  cmd == curses.KEY_UP :
 			if pad_pos >= 1 :
 				pad_pos -= 1
+			frames(rows,columns)
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
+			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
 		elif cmd == curses.KEY_LEFT :
 			if pad_posx >= 1 :
 				pad_posx -= 1
+			frames(rows,columns)
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
+			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
 		elif cmd == curses.KEY_RIGHT :
 			if pad_posx <= 2999 :
 				pad_posx += 1
+			frames(rows,columns)
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
+			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
 		elif cmd == ord('k') :
 			if pad_posx <= 4999 :
 				lpad_pos += 1
+			frames(rows,columns)
 			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
+			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
 		elif cmd == ord('i') :
 			if lpad_pos >= 1 :
 				lpad_pos -= 1
+			frames(rows,columns)
 			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
+			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
 		elif cmd == ord('j') :
 			if script == False :
 				script = True
@@ -142,6 +154,8 @@ else :
 				pad.clear()
 				try: pad.addstr(body)
 				except curses.error: pass
+			frames(rows,columns)
+			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
 		elif cmd == ord('s') :
 			if source == False :
