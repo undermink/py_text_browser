@@ -69,7 +69,7 @@ else :
 	if bs.title :
 		try : urlheader.addstr(0,0,bs.title.text, curses.color_pair(1))
 		except : pass
-	try: text = bs.body
+	try: text = str(bs.body)
 	except : pass
 	
 	text1 = regex(text,columns)
