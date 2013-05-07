@@ -36,6 +36,7 @@ pad_pos = 0
 pad_posx = 0
 lpad_pos = 0
 links = []
+lnkdict = {}
 url = getinput(getUrl)
 
 try : Response = urllib.urlopen("http://"+url)
@@ -85,6 +86,7 @@ else :
 		if link.get('href') != None :
 			count += 1
 			links.append(link.get("href"))
+			lnkdict[count] = link.get("href")
 			linklist += "[" + str(count) + "] " + link.text.strip() + " => " + link.get('href') + "\n"
 	try: 
 		utflinks = linklist.encode('utf-8', 'ignore')
@@ -135,6 +137,26 @@ else :
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
 		elif cmd == ord('#') :
 		    	number = linkwin(rows,columns)
+			url = lnkdict[int(number)]
+			try : Response = urllib.urlopen(url)
+			except : pass
+			pad.clear()
+			lpad.clear()
+			body = ''
+			count = 0
+			linklist = []
+			lnkdict = {}
+			bs = BeautifulSoup(Response.read(), "lxml")
+			try: urlheader.addstr(0,0,bs.title.text, curses.color_pair(1))
+			except : pass
+			try : text = bs.body
+			except : pass
+			text1 = regex(text,columns)
+			for line in text1.split("\n") :
+				if line.strip() :
+					body += line + "\n"
+			try : pad.addstr(body)
+			except curses.error : pass
 			frames(rows,columns)
 			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
