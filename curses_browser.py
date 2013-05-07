@@ -157,7 +157,15 @@ else :
 					body += line + "\n"
 			try : pad.addstr(body)
 			except curses.error : pass
+			for link in bs.find_all("a") :
+			  	count += 1
+				lnkdict[count] = link.get("href")
+				linklist += "[" + str(count) + "] " + link.text.strip() + " => " + link.get('href') + "\n"
 			frames(rows,columns)
+			try :
+			  	utflinks = linklist.encode('utf-8')
+				lpad.addstr(utflinks)
+			except : pass
 			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
 		elif cmd == ord('j') :
