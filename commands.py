@@ -47,12 +47,11 @@ def show_help(rows,columns) :
 	helpwin.addstr(4,2,"s = Seitenquelltext zeigen")
 	helpwin.addstr(5,2,"j = Javascript anzeigen")
 	helpwin.addstr(6,2,"u = URL eingeben")
-	#helpwin.addstr(6,2,"a = Seiteninhalt nach links scrollen")
-	#helpwin.addstr(7,2,"d = Seiteninhalt nach rechts scrollen")
-	helpwin.addstr(7,2,"i = Linkliste nach oben scrollen")
-	helpwin.addstr(8,2,"k = Linkliste nach unten scrollen")
-	helpwin.addstr(9,2,"q = Programm beenden")
-	helpwin.addstr(11,2,"Pfeiltasten = Seiteninhalt scrollen")
+	helpwin.addstr(7,2,"# = Link aus Liste waehlen")
+	helpwin.addstr(8,2,"i = Linkliste nach oben scrollen")
+	helpwin.addstr(9,2,"k = Linkliste nach unten scrollen")
+	helpwin.addstr(10,2,"q = Programm beenden")
+	helpwin.addstr(13,2,"Pfeiltasten = Seiteninhalt scrollen")
 	helpwin.refresh()
 	helpwin.getch()
 	helpwin.erase()
@@ -82,6 +81,7 @@ def regex(text,columns) :
 	text1 = re.sub("<tr.*?>","\n",text1)
 	text1 = re.sub("<.*?>","",text1)
 	text1 = re.sub("(.{1,%i})(\s+|\Z)" %columns, "\\1\n", text1)
+	#text1 = text1.encode('utf-8','ignore')
 	return text1
 
 def exit(scr) :

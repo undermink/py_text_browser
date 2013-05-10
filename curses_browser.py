@@ -71,10 +71,11 @@ else :
 	for line in text1.split("\n") :
 
 		if line.strip() :
-
+			
 			body += line + "\n"
 
-	try : pad.addstr(body)
+	try : 
+		pad.addstr(body)
 	except curses.error: pass
 	curses.cbreak()
 	curses.noecho()
@@ -144,7 +145,7 @@ else :
 			lpad.clear()
 			body = ''
 			count = 0
-			linklist = []
+			linklist = ''
 			lnkdict = {}
 			bs = BeautifulSoup(Response.read(), "lxml")
 			try: urlheader.addstr(0,0,bs.title.text, curses.color_pair(1))
@@ -163,9 +164,9 @@ else :
 				linklist += "[" + str(count) + "] " + link.text.strip() + " => " + link.get('href') + "\n"
 			frames(rows,columns)
 			try :
-			  	utflinks = linklist.encode('utf-8')
+			  	utflinks = linklist.encode('utf-8', 'ignore')
 				lpad.addstr(utflinks)
-			except : pass
+			except curses.error: pass
 			lpad.refresh(lpad_pos,0,8,columns+columns/4,rows+(rows/4)*3,columns+columns-4)
 			pad.refresh(pad_pos, pad_posx, 8, 3, rows+(rows/4)*3, (columns+columns/4)-3)
 		elif cmd == ord('j') :
